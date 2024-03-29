@@ -1,15 +1,18 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const PORT = process.env.DEV_APP_PORT || 4080
 
+// Init middlewares
+app.use(bodyParser.json())
+
 // Connect databases
 require('./src/databases/init.mongodb.js')
 
-app.get('/', (req, res) => {
-    res.send('hello')
-})
+// Init router
+app.use('', require('./src/routes/index.js'))
 
 // Error handling
 app.use((error, req, res, next) => {
