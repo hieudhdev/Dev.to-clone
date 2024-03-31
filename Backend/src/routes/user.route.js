@@ -8,5 +8,6 @@ const userController = require('../controllers/user.controller')
 
 // router
 router.post('/signup', apiErrorHandler(userController.signUp))
+router.post('/login', apiErrorHandler(userController.login))
 
 module.exports = router

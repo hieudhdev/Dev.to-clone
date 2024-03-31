@@ -10,7 +10,7 @@ const { JWT_KEY } = process.env
 class UserService {
 
     static async signUp (payload) {
-        // check payload ???
+        // check payload ?????
 
         const { name, email, password } = payload
 
@@ -20,7 +20,7 @@ class UserService {
 
         // hash password
         const passHashed = await bcrypt.hash(password, 12)
-        const imgUrl = 'unkhown'
+        const imgUrl = 'unkhown'    // NOTE: ??????
 
         // save user
         const newUser = await User.create({ 
@@ -53,6 +53,34 @@ class UserService {
         return {
             code: 200,
             newUser,
+            token
+        }
+    }
+
+    static async login (payload) {
+        // check payload ???
+
+        const { email, password } = payload
+
+        // check email (user)
+        const foundUser = await User.findOne({ email: email }).lean()   // FIND WITH FOLLOWING TAG
+        if (!foundUser) throw new HttpError('Email not registed!', 404)
+        console.log(foundUser)        
+        // check password
+        const isValidPasss = await bcrypt.compare(password, foundUser.password)
+        if (!isValidPasss) throw new HttpError('Password is not correct!', 500)
+
+        //gen a token
+        const token = await jwt.sign({
+            userId: foundUser._id,
+            email: foundUser.email
+        }, JWT_KEY, {
+            expiresIn: '1h'
+        })
+
+        return {
+            code: 200,
+            foundUser,
             token
         }
     }

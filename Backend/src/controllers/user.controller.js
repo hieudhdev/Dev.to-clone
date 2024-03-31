@@ -12,6 +12,13 @@ class UserController {
         res.status(200).json(metadata)
     }
 
+    login = async (req, res, next) => {
+        const metadata = await userService.login(req.body)
+        if (!metadata) throw new HttpError('User login failed', 500)
+
+        res.status(200).json(metadata)
+    }
+
 }
 
 module.exports = new UserController()
