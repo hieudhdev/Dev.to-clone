@@ -19,6 +19,27 @@ class UserController {
         res.status(200).json(metadata)
     }
 
+    update = async (req, res, next) => {
+        const metadata = await userService.updateUser(req.params, req.body)
+        if (!metadata) throw new HttpError('Update user failed', 500)
+
+        res.status(200).json(metadata)
+    }
+
+    followUser = async (req, res, next) => {
+        const metadata = await userService.followUser(req.body)
+        if (!metadata) throw new HttpError('Follow user failed', 500)
+
+        res.status(200).json(metadata)
+    }
+
+    unFollowUser = async (req, res, next) => {
+        const metadata = await userService.unFollowUser(req.body)
+        if (!metadata) throw new HttpError('UnFollow user failed', 500)
+
+        res.status(200).json(metadata)
+    }
+
 }
 
 module.exports = new UserController()

@@ -4,6 +4,7 @@ const User = require('../models/user.model')
 const HttpError = require('../core/error.response')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const { ConvertToObjectId } = require('../utils/index')
 
 const { JWT_KEY } = process.env
 
@@ -83,6 +84,71 @@ class UserService {
             foundUser,
             token
         }
+    }
+
+    static async updateUser (params, payload) {
+        // check payload
+
+        const userId = params.userId
+        
+        // upload avatar (file)
+        const imgUrl = 'not build yet'
+        const bodyUpdate = { ...payload, avatar: imgUrl }
+
+        const updateUser = await User.findByIdAndUpdate( ConvertToObjectId(userId), bodyUpdate, { new: true })
+        if (!updateUser) throw new HttpError('User update failed!', 500)
+
+        return updateUser
+    }
+
+    static async followUser (payload) {
+        const { userId, followId } = payload
+
+        // Transaction require -> Not build yet because i'm lazy
+        const userUpdate = await User.findByIdAndUpdate(
+            ConvertToObjectId(userId),
+            { $addToSet: { following: followId }}, 
+            { new: true }
+        )
+
+        const followerUpdate = await User.findByIdAndUpdate(
+            ConvertToObjectId(followId),
+            { $addToSet: { followers: userId} }, 
+            { new: true }
+        )
+
+        if (!userUpdate || !followerUpdate) throw new Error('Follow user fail, Pls Rollback DB!')
+        
+        // Push noti
+        // const notiPush = await followNotification(userId, followId)
+        // if (notiPush) throw new Error('Notification push fail!')
+
+        return userUpdate
+    }
+
+    static async unFollowUser (payload) {
+        const { userId, unFollowId } = payload
+
+        // Transaction require -> Not build yet because i'm lazy
+        const userUpdate = await User.findByIdAndUpdate(
+            ConvertToObjectId(userId),
+            { $pull: { following: unFollowId }}, 
+            { new: true }
+        )
+
+        const unFollowerUpdate = await User.findByIdAndUpdate(
+            ConvertToObjectId(unFollowId),
+            { $pull: { followers: userId} }, 
+            { new: true }
+        )
+
+        if (!userUpdate || !unFollowerUpdate) throw new Error('Unfollow user fail, Pls Rollback DB!')
+        
+        // Push noti
+        // const notiPush = await followNotification(userId, followId)
+        // if (notiPush) throw new Error('Notification push fail!')
+
+        return userUpdate
     }
 
 }
