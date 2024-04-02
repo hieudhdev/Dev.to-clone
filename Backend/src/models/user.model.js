@@ -11,7 +11,6 @@ const userSchema = new Schema({
     avatar: { type: String },
     bio: { type: String },
     links: { type: String },
-    joinDate: { type: Date, default: Date.now },
     location: { type: String },
     work: { type: String },
     skills: { type: String },
@@ -21,6 +20,8 @@ const userSchema = new Schema({
     followers: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     followedTags: [{ type: mongoose.Types.ObjectId, ref: 'Tag' }],
     bookmarks: [{ type: mongoose.Types.ObjectId, ref: 'Post' }],
+}, {
+    timestamps: true
 });
 
 // userSchema.plugin(uniqueValidator);

@@ -8,13 +8,14 @@ const postSchema = new Schema({
     image: { type: String, required: true },
     body: { type: String, required: true },
     tags: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Tag' }],
-    date: { type: Date, default: Date.now },
     titleURL: { type: String, required: true },
     likes: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     bookmarks: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     unicorns: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     comments: [{ type: mongoose.Types.ObjectId, required: true, ref: 'Comment' }],
     author: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Post', postSchema); 
