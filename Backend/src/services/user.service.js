@@ -5,6 +5,7 @@ const HttpError = require('../core/error.response')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { ConvertToObjectId } = require('../utils/index')
+const NotificationService = require('../services/notification.service')
 
 const { JWT_KEY } = process.env
 
@@ -120,8 +121,8 @@ class UserService {
         if (!userUpdate || !followerUpdate) throw new Error('Follow user fail, Pls Rollback DB!')
         
         // Push noti
-        // const notiPush = await followNotification(userId, followId)
-        // if (notiPush) throw new Error('Notification push fail!')
+        const notiPush = await NotificationService.followNotification({ userId, followId })
+        if (!notiPush) throw new Error('Notification push fail!')
 
         return userUpdate
     }
@@ -143,10 +144,6 @@ class UserService {
         )
 
         if (!userUpdate || !unFollowerUpdate) throw new Error('Unfollow user fail, Pls Rollback DB!')
-        
-        // Push noti
-        // const notiPush = await followNotification(userId, followId)
-        // if (notiPush) throw new Error('Notification push fail!')
 
         return userUpdate
     }
