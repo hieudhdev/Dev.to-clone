@@ -19,7 +19,7 @@ class Database {
         // Connect mongodb
         mongoose.connect(url)
         .then(() => console.log('Connect database successfully! (SINGLETON PATTERN)'))
-        .catch(err => console.log('Error connect!'))
+        .catch(err => console.log(err))
     }
 
     // SingleTon pattern
