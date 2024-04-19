@@ -4,25 +4,52 @@ const User = require('../models/user.model')
 const HttpError = require('../core/error.response')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const { ConvertToObjectId } = require('../utils/index')
+const { validationResult } = require('express-validator');
+const { ConvertToObjectId, uploadToCloudinary } = require('../utils/index')
 const NotificationService = require('../services/notification.service')
 
+const defaultAvatar = 'https://res.cloudinary.com/dzu5qbyzq/image/upload/v1713546846/devto/DENO_jx87zz.jpg'
 const { JWT_KEY } = process.env
 
 class UserService {
 
-    static async signUp (payload) {
-        // check payload ?????
+    // NOT DONE
+    static async getUserById (userId) {
+        const foundUser = await User.findById(userId, '-password')
+        .populate({     // getter
+            path: 'post',
+            populate: {
+                path: 'tags'
+            }
+        })
+        .populate({     // getter
+            path: 'followedTags'
+        })
 
-        const { name, email, password } = payload
+        if (!foundUser) throw new HttpError('User not found', 404)
+
+        return {
+            user: foundUser.toObject({ getters: true }) // same as .lean() but included any getter defined in foundUser
+        }
+    }
+
+    static async signUp (req) {
+        // check payload
+        const error = validationResult(req)
+        if (!error.isEmpty()) throw new HttpError('Invalid inputs passed, please check your data', 422)
+
+        const { name, email, password } = JSON.parse(req.body.userInfo)
 
         // check email (user) exist
         const foundUser = await User.findOne({ email: email })
         if (foundUser) throw new HttpError('Email registered', 400)
-
+               
         // hash password
         const passHashed = await bcrypt.hash(password, 12)
-        const imgUrl = 'unkhown'    // NOTE: ??????
+
+        // upload image to cloud
+        const imgUrl = await uploadToCloudinary(req.file) || defaultAvatar
+        if (req.file || !imgUrl) throw new HttpError ('Upload avatar fail')
 
         // save user
         const newUser = await User.create({ 

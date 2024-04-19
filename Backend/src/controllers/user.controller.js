@@ -6,9 +6,8 @@ const HttpError = require('../core/error.response')
 class UserController {
 
     signUp = async (req, res, next) => {
-        const metadata = await userService.signUp(req.body)
+        const metadata = await userService.signUp(req)
         if (!metadata) throw new HttpError('User signup failed', 500)
-
         res.status(200).json(metadata)
     }
 
@@ -36,6 +35,13 @@ class UserController {
     unFollowUser = async (req, res, next) => {
         const metadata = await userService.unFollowUser(req.body)
         if (!metadata) throw new HttpError('UnFollow user failed', 500)
+
+        res.status(200).json(metadata)
+    }
+
+    getUserById = async (req, res, next) => {
+        const metadata = await userService.getUserById(req.params.userId)
+        if (!metadata) throw new HttpError('Get user failed', 500)
 
         res.status(200).json(metadata)
     }
