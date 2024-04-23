@@ -12,7 +12,6 @@ const ConvertToObjectId = (id) => {
 
 const uploadToCloudinary = async (file) => {
     try {
-        console.log(file)
         const extName = path.extname(file.originalname).toString()
         const file64 = parser.format(extName, file.buffer)
 

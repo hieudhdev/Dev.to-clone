@@ -19,7 +19,7 @@ class UserController {
     }
 
     update = async (req, res, next) => {
-        const metadata = await userService.updateUser(req.params, req.body)
+        const metadata = await userService.updateUser(req)
         if (!metadata) throw new HttpError('Update user failed', 500)
 
         res.status(200).json(metadata)

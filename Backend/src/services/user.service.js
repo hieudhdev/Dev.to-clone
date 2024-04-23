@@ -49,7 +49,6 @@ class UserService {
 
         // upload image to cloud
         const imgUrl = await uploadToCloudinary(req.file) || defaultAvatar
-        if (req.file || !imgUrl) throw new HttpError ('Upload avatar fail')
 
         // save user
         const newUser = await User.create({ 
@@ -94,7 +93,7 @@ class UserService {
         // check email (user)
         const foundUser = await User.findOne({ email: email }).lean()   // FIND WITH FOLLOWING TAG
         if (!foundUser) throw new HttpError('Email not registed!', 404)
-        console.log(foundUser)        
+              
         // check password
         const isValidPasss = await bcrypt.compare(password, foundUser.password)
         if (!isValidPasss) throw new HttpError('Password is not correct!', 500)
@@ -114,14 +113,18 @@ class UserService {
         }
     }
 
-    static async updateUser (params, payload) {
+    static async updateUser (req) {
         // check payload
 
-        const userId = params.userId
+        const userId = req.params.userId
+        let bodyUpdate = { ...JSON.parse(req.body.bodyUpdate) }
         
         // upload avatar (file)
-        const imgUrl = 'not build yet'
-        const bodyUpdate = { ...payload, avatar: imgUrl }
+        if (req.file) {
+            const imgUrl = await uploadToCloudinary(req.file)
+            if (imgUrl) bodyUpdate = { ...bodyUpdate, avatar: imgUrl }
+            else console.log('Update avatar to cloudinary failed!')
+        }
 
         const updateUser = await User.findByIdAndUpdate( ConvertToObjectId(userId), bodyUpdate, { new: true })
         if (!updateUser) throw new HttpError('User update failed!', 500)

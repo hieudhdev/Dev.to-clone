@@ -11,7 +11,7 @@ const fileUpload = require('../middlewares/fileUpload')
 router.get('/:userId', apiErrorHandler(userController.getUserById))
 router.post('/signup', fileUpload.single('avatar'), apiErrorHandler(userController.signUp))
 router.post('/login', apiErrorHandler(userController.login))
-router.post('/update/:userId', apiErrorHandler(userController.update))
+router.patch('/update/:userId', fileUpload.single('avatar'), apiErrorHandler(userController.update))
 router.post('/followUser', apiErrorHandler(userController.followUser))
 router.post('/unFollowUser', apiErrorHandler(userController.unFollowUser))
 
